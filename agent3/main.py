@@ -560,6 +560,8 @@ def agent(state: EditState):
 
 def should_continue(state: EditState):
     """Route: if the LLM requested a tool, run it, otherwise stop."""
+    # This edge links the agent node with the tools node (function returns tools if we should go to
+    # the tools node next and else it returns END if we should go to the END node next)
     return "tools" if state["messages"][-1].tool_calls else END
 
 
@@ -568,6 +570,8 @@ def build_app():
     g.add_node("agent", agent)
     g.add_node("tools", ToolNode(TOOLS))
     g.add_edge(START, "agent")
+    # This conditional edge links the agent node with the tools node (function returns tools if we 
+    # should go to the tools node next and else it returns END if we should go to the END node next)
     g.add_conditional_edges("agent", should_continue)
     g.add_edge("tools", "agent")
     return g.compile()
